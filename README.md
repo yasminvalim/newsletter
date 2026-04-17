@@ -1,2 +1,50 @@
-# CoreOS newsletter
-Weekly engineering newsletter proof of concept. Pulls recent activity from GitHub, GitLab, and Jira via their APIs, saves a combined JSON snapshot, and uses Google Gemini to turn that data into a structured summary and a Markdown newsletter you can share internally.
+# CoreOS Newsletter (POC)
+
+Pull updates from **GitHub**, **GitLab**, and **Jira**, then optionally use **Google Gemini** to write a weekly **Markdown newsletter**.
+
+---
+
+## Quick start
+
+### 1. Install
+
+```bash
+cd coreos-newsletter
+python3 -m venv .venv
+source .venv/bin/activate         
+pip install -r requirements.txt
+```
+
+### 2. Configure
+
+```bash
+cp .env.example .env
+```
+
+Edit **`.env`**: add tokens and IDs for the tools you use (see comments in `.env.example`). You can leave unused sections blank; those sources are skipped.
+
+### 3. Run
+
+Always activate the venv first (`source .venv/bin/activate`).
+
+**Option A — everything in one go** (fetch data → Gemini summary → Markdown newsletter):
+
+```bash
+PYTHONPATH=src python -m coreos_newsletter all --days 7 --out output
+```
+
+**Option B — step by step:**
+
+| Step | Command | Output |
+|------|---------|--------|
+| Download activity | `PYTHONPATH=src python -m coreos_newsletter fetch --days 7 --out output` | `output/bundle.json` |
+| Gemini summary (needs `GOOGLE_API_KEY`) | `PYTHONPATH=src python -m coreos_newsletter summarize --out output --bundle output/bundle.json` | `output/gemini_summary.json` |
+| Newsletter text (needs `GOOGLE_API_KEY`) | `PYTHONPATH=src python -m coreos_newsletter draft --out output --summary output/gemini_summary.json` | `output/newsletter.md` |
+
+### 4. Read the results
+
+- **`output/bundle.json`** — raw combined data from your APIs  
+- **`output/gemini_summary.json`** — structured summary from Gemini  
+- **`output/newsletter.md`** — newsletter you can paste into Slack or email  
+
+---
