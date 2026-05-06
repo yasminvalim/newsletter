@@ -38,7 +38,12 @@ class Settings(BaseSettings):
         default=None,
         validation_alias=AliasChoices("GOOGLE_API_KEY", "GEMINI_API_KEY"),
     )
-    gemini_model: str = Field(default="gemini-2.0-flash", alias="GEMINI_MODEL")
+    # Vertex AI (Gemini on GCP): uses Application Default Credentials — no API key required.
+    google_cloud_project: str | None = Field(default=None, alias="GOOGLE_CLOUD_PROJECT")
+    google_cloud_location: str = Field(default="us-central1", alias="GOOGLE_CLOUD_LOCATION")
+
+    # Vertex: use a model id your project/region exposes (see Model Garden / release notes).
+    gemini_model: str = Field(default="gemini-2.5-flash", alias="GEMINI_MODEL")
 
     @field_validator("google_api_key", mode="before")
     @classmethod
